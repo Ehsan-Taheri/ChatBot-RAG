@@ -8,9 +8,9 @@ def load_secrets():
     return api_key
 
 def main():
-    st.set_page_config(page_title="RAG Chatbot", page_icon="🤖", layout="wide")
+    st.set_page_config(page_title="RAG Chatbot", page_icon="💬", layout="wide")
     st.sidebar.title("Navigation")
-    selection = st.sidebar.radio("Select a page:", ["Document Embedding", "RAG Chatbot"])
+    selection = st.sidebar.radio("Select a page:", ["Document Embedding", "Chatbot"])
 
     if selection == "Document Embedding":
         display_document_embedding_page()
@@ -28,7 +28,7 @@ def display_document_embedding_page():
         instruct_embeddings = st.text_input("Instruct Embeddings Model", value="sentence-transformers/all-MiniLM-L6-v2")
         chunk_size = st.number_input("Chunk Size", value=200, min_value=0, step=1)
         chunk_overlap = st.number_input("Chunk Overlap", value=10, min_value=0, step=1)
-        
+
         if not os.path.exists("vector store"):
             os.makedirs("vector store")
         vector_store_list = ["<New>"] + vector_store_list
