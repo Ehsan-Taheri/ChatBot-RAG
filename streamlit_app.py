@@ -8,9 +8,9 @@ def load_secrets():
     return api_key
 
 def main():
-    st.set_page_config(page_title="RAG Chatbot", page_icon="💬", layout="wide")
+    st.set_page_config(page_title="RAG Chatbot", page_icon="🤖", layout="wide")
     st.sidebar.title("Navigation")
-    selection = st.sidebar.radio("Select a page:", ["Document Embedding", "Chatbot"])
+    selection = st.sidebar.radio("Select a page:", ["Document Embedding", "RAG Chatbot"])
 
     if selection == "Document Embedding":
         display_document_embedding_page()
