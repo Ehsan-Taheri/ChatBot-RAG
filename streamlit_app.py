@@ -69,8 +69,7 @@ def display_chatbot_page():
             api_key = load_secrets()
             if api_key:
                 token = st.text_input("Hugging Face Token (No need to insert)", type='password', value="******")
-            else:
-                token = st.text_input("Hugging Face Token (No need to insert)", type='password')
+            
             llm_model = st.text_input("LLM Model", value="tiiuae/falcon-7b-instruct")
             instruct_embeddings = st.text_input("Instruct Embeddings", value="sentence-transformers/all-MiniLM-L6-v2")
             vector_store_list = os.listdir("vector store")
