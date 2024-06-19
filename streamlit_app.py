@@ -39,7 +39,7 @@ def display_document_embedding_page():
 
     with st.form("document_input"):
         document = st.file_uploader("Upload Documents (PDF or TXT)", type=['pdf', 'txt'], accept_multiple_files=True)
-        url = st.text_input("Provide URL")
+        url = st.text_input("Provide URL(It will be combined with PDF or Text if you have)")
         instruct_embeddings = st.text_input("Instruct Embeddings Model", value="sentence-transformers/all-MiniLM-L6-v2")
         chunk_size = st.number_input("Chunk Size", value=200, min_value=0, step=1)
         chunk_overlap = st.number_input("Chunk Overlap", value=10, min_value=0, step=1)
