@@ -1,4 +1,6 @@
 import os
+import requests
+from bs4 import BeautifulSoup
 import streamlit as st
 from document_processing import read_pdf, read_txt, split_doc, embedding_storing
 from chatbot import prepare_rag_llm, generate_answer
@@ -6,6 +8,18 @@ from chatbot import prepare_rag_llm, generate_answer
 def load_secrets():
     api_key = st.text_input("Enter your API Key:", type='password')
     return api_key
+
+def fetch_url_content(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Check for request errors
+        soup = BeautifulSoup(response.text, 'html.parser')
+        # Extract text from the page
+        text = ' '.join(p.get_text() for p in soup.find_all('p'))
+        return text
+    except requests.RequestException as e:
+        st.error(f"Failed to fetch the content from URL: {e}")
+        return ""
 
 def main():
     st.set_page_config(page_title="Chatbot", page_icon="💬", layout="wide")
@@ -21,10 +35,11 @@ def display_document_embedding_page():
     vector_store_list = [item for item in os.listdir("vector store") if item != ".DS_Store"]
 
     st.title("Document Embedding")
-    st.markdown("Upload documents to create a custom knowledge base for the chatbot.")
+    st.markdown("Upload documents or provide URLs to create a custom knowledge base for the chatbot.")
 
     with st.form("document_input"):
         document = st.file_uploader("Upload Documents (PDF or TXT)", type=['pdf', 'txt'], accept_multiple_files=True)
+        url = st.text_input("Provide URL")
         instruct_embeddings = st.text_input("Instruct Embeddings Model", value="sentence-transformers/all-MiniLM-L6-v2")
         chunk_size = st.number_input("Chunk Size", value=200, min_value=0, step=1)
         chunk_overlap = st.number_input("Chunk Overlap", value=10, min_value=0, step=1)
@@ -37,14 +52,19 @@ def display_document_embedding_page():
         save_button = st.form_submit_button("Save Vector Store")
 
     if save_button:
+        combined_content = ""
         if document:
-            combined_content = ""
             for file in document:
                 if file.name.endswith(".pdf"):
                     combined_content += read_pdf(file)
                 elif file.name.endswith(".txt"):
                     combined_content += read_txt(file)
 
+        if url:
+            url_content = fetch_url_content(url)
+            combined_content += url_content
+
+        if combined_content:
             split = split_doc(combined_content, chunk_size, chunk_overlap)
             create_new_vs = existing_vector_store == "<New>"
 
@@ -54,7 +74,7 @@ def display_document_embedding_page():
             except ValueError as e:
                 st.error(f"Error: {e}")
         else:
-            st.warning("Please upload at least one file.")
+            st.warning("Please upload at least one file or provide a URL.")
 
 def display_chatbot_page():
     st.title("Multi Source Chatbot")
